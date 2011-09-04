@@ -1,0 +1,49 @@
+.olControlAttribution {
+    margin: 0;
+    padding: 0 5px;
+    
+    font: 11px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    color: #333;
+    
+    background-color: rgba(255, 255, 255, 0.7);
+            
+    -moz-box-shadow: 0 0 7px #ccc;
+    -webkit-box-shadow: 0 0 7px #ccc;
+    box-shadow: 0 0 7px #ccc;
+    bottom: 0px;
+    right: 0px;
+    }
+.olControlZoomPanel {
+    padding: 5px;
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.25);
+    width: 19px;
+    height: 43px;
+    top: 10px;
+    left: 10px;
+}
+.olControlZoomPanel .olControlZoomInItemInactive,.olControlZoomPanel .olControlZoomOutItemInactive {
+    width: 27px;
+    height: 27px;
+    -moz-border-radius: 4px 4px 4px 4px;
+    height: 19px;
+    width: 19px;
+    background-color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 5px;
+    background-repeat: no-repeat;
+}
+.olControlZoomPanel .olControlZoomInItemInactive {
+    background: url(http://leaflet.cloudmade.com/dist/images/zoom-in.png) no-repeat rgba(255, 255, 255, 0.75) 5px 5px; 
+}
+.olControlZoomPanel .olControlZoomOutItemInactive {
+    background: url(http://leaflet.cloudmade.com/dist/images/zoom-out.png) no-repeat rgba(255, 255, 255, 0.75) 5px 5px; 
+}
+.olControlZoomPanel .olControlZoomInItemInactive:hover,.olControlZoomPanel .olControlZoomOutItemInactive:hover {
+    background-color: #fff;
+    cursor: pointer;
+}
+.olControlZoomPanel .olControlZoomToMaxExtentItemInactive {
+    display: none;
+}
