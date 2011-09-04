@@ -1,4 +1,44 @@
+// Override the default OpenLayers style with the default Leaflet style.
+OpenLayers.Feature.Vector.style['default'] = OpenLayers.Util.applyDefaults({
+    'fillColor': '#0033ff',
+    'strokeWidth': 5,
+    'strokeColor': '#0033ff',
+    'fillOpacity': '0.2',
+    'strokeOpacity': '0.5'}, 
+    OpenLayers.Feature.Vector.style['default']);
 var L = {};
+L.Point = OpenLayers.Size;
+L.Icon = new OpenLayers.Class({
+    initialize: function(url) {
+        if (url) {
+            this.iconUrl = url;
+        }
+    }    
+});
+L.Icon.extend = function(opts) {
+    var cls = OpenLayers.Class(L.Icon, opts);
+    return cls;
+}
+L.styleToSymbolizer = function(style) {
+    var symbprops = {}
+    for (var key in style) {
+        if (key == "color") {
+            symbprops['strokeColor'] = style[key];
+            symbprops['fillColor'] = style[key];
+        }
+        if (key == "opacity") {
+            symbprops['strokeOpacity'] = style[key];
+        }
+    }
+    var symb = OpenLayers.Util.applyDefaults(symbprops, OpenLayers.Feature.Vector.style['default']);
+    return symb;
+}    
+L.lonlatToLeafletLL = function(ll) {
+    ll.transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));    
+    ll.lng = ll.lon;
+    ll.lat = ll.lat;
+    return ll;
+}
 L.TileLayer = new OpenLayers.Class(OpenLayers.Layer.XYZ, {
     sphericalMercator: true,
     wrapDateLine: true,
@@ -47,46 +87,31 @@ L.Map = OpenLayers.Class(OpenLayers.Map, {
 OpenLayers.Events.prototype._triggerEvent = OpenLayers.Events.prototype.triggerEvent;
 OpenLayers.Events.prototype.triggerEvent = function(type, evt) {
     if (evt && evt.xy && this.object.getLonLatFromPixel) {
-        evt.latlng = lonlatToLeafletLL(this.object.getLonLatFromPixel(evt.xy));
+        evt.latlng = L.lonlatToLeafletLL(this.object.getLonLatFromPixel(evt.xy));
     }
     this._triggerEvent(type, evt);
 }
-lonlatToLeafletLL = function(ll) {
-    ll.transform(new OpenLayers.Projection("EPSG:900913"), new OpenLayers.Projection("EPSG:4326"));    
-    ll.lng = ll.lon;
-    ll.lat = ll.lat;
-    return ll;
-}
 L.Map.prototype._addLayer = OpenLayers.Map.prototype.addLayer;
-L.Marker = function(loc) { 
-    return new OpenLayers.Feature.Vector(loc, {}, 
-        {'externalGraphic': 'http://leaflet.cloudmade.com/dist/images/marker.png',
-         'graphicWidth': 25, 'graphicHeight': 41,
-         'graphicXOffset': -13, 'graphicYOffset': -41});
+L.Marker = function(loc, opts) {
+    var style = L.Marker.defaultIcon;
+    if (opts.icon) {
+        style = {
+            externalGraphic: opts.icon.iconUrl,
+            graphicWidth: opts.icon.iconSize.w,
+            graphicHeight: opts.icon.iconSize.h,
+            graphicXOffset: -opts.icon.iconAnchor.w,
+            graphicYOffset: -opts.icon.iconAnchor.h
+        }
+    }   
+    console.log(style);
+    return new OpenLayers.Feature.Vector(loc, {}, style)
 }
-OpenLayers.Feature.Vector.style['default'] = OpenLayers.Util.applyDefaults({
-    'fillColor': '#0033ff',
-    'strokeWidth': 5,
-    'strokeColor': '#0033ff',
-    'fillOpacity': '0.2',
-    'strokeOpacity': '0.5'}, OpenLayers.Feature.Vector.style['default']);
-function styleToSymbolizer(style) {
-    var symbprops = {}
-    for (var key in style) {
-        if (key == "color") {
-            symbprops['strokeColor'] = style[key];
-            symbprops['fillColor'] = style[key];
-        }
-        if (key == "opacity") {
-            symbprops['strokeOpacity'] = style[key];
-        }
-    }
-    var symb = OpenLayers.Util.applyDefaults(symbprops, OpenLayers.Feature.Vector.style['default']);
-    return symb;
-}    
+L.Marker.defaultIcon = {'externalGraphic': 'http://leaflet.cloudmade.com/dist/images/marker.png',
+         'graphicWidth': 25, 'graphicHeight': 41,
+         'graphicXOffset': -13, 'graphicYOffset': -41};
 L.Circle = function(loc, radius, options) {
     var geom = OpenLayers.Geometry.Polygon.createRegularPolygon(loc, radius, 100, 0);
-    var f = new OpenLayers.Feature.Vector(geom, {}, styleToSymbolizer(options));
+    var f = new OpenLayers.Feature.Vector(geom, {}, L.styleToSymbolizer(options));
     return f;
 }   
 L.Polygon = function(points) {
