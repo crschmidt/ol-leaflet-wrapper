@@ -94,7 +94,7 @@ OpenLayers.Events.prototype.triggerEvent = function(type, evt) {
 L.Map.prototype._addLayer = OpenLayers.Map.prototype.addLayer;
 L.Marker = function(loc, opts) {
     var style = L.Marker.defaultIcon;
-    if (opts.icon) {
+    if (opts && opts.icon) {
         style = {
             externalGraphic: opts.icon.iconUrl,
             graphicWidth: opts.icon.iconSize.w,
@@ -103,7 +103,6 @@ L.Marker = function(loc, opts) {
             graphicYOffset: -opts.icon.iconAnchor.h
         }
     }   
-    console.log(style);
     return new OpenLayers.Feature.Vector(loc, {}, style)
 }
 L.Marker.defaultIcon = {'externalGraphic': 'http://leaflet.cloudmade.com/dist/images/marker.png',
